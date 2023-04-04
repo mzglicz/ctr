@@ -52,7 +52,7 @@ public class AdminLinksController {
 
     @GetMapping("")
     Mono<LinkAllResponse> getAll(@RequestParam(value = "limit", defaultValue = "10") @Min(10) @Max(100) Integer limit,
-                                 @Size(max=40) @Pattern(regexp = "^[0-9a-zA-Z\\-]*$") @RequestParam(value = "last", required = false) String last) {
+                                 @Size(max=40) @Pattern(regexp = "^[0-9a-zA-Z\\-]*$") @RequestParam(value = "next", required = false) String last) {
         return this.linkService.getAll(limit, last).collectList().map(x -> {
             if (!x.isEmpty()) {
                 return new LinkAllResponse(x, x.get(x.size() - 1).id());

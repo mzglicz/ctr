@@ -39,7 +39,7 @@ public class LinkMongoStorage {
         query.limit(limit);
         query.with(Sort.by(Sort.Direction.ASC, "_id"));
         next.ifPresent(value -> query.addCriteria(Criteria.where("_id").gt(value)));
-        return this.mongoOperations.findAll(LinkDocument.class, "links");
+        return this.mongoOperations.find(query, LinkDocument.class, "links");
     }
 
     public Mono<LinkDocument> getById(String id) {

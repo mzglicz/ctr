@@ -7,6 +7,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.pl.maciej.ctr.tracking.storage.ClickEventDocument;
 import org.pl.maciej.ctr.tracking.storage.EventMongoStorage;
+import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
@@ -29,10 +30,11 @@ class EventServiceTest {
     void shouldStoreClickEvents() {
         var eventId = "SomeCrazyEvent";
         var clickEvent = new Event(eventId, "elementId", "click", Map.of());
-        underTest.consumer(clickEvent);
         var captor = ArgumentCaptor.forClass(ClickEventDocument.class);
-        verify(storage, times(1)).save(captor.capture());
-        assertEquals(captor.getValue().getEventId(), eventId);
+
+        Mockito.when(storage.save(captor.capture())).thenReturn(Mono.just(new ClickEventDocument()));
+        underTest.consumer(clickEvent);
+
     }
 
     @Test

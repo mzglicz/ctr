@@ -149,6 +149,7 @@ public class LinksTests extends TestBase {
 
         assertNotNull(firstResponse);
         assertNotNull(firstResponse.next());
+        assertEquals(limit, firstResponse.items().size());
         assertNotEquals("", firstResponse.next());
 
         var secondResponse =  webTestClient
@@ -169,6 +170,7 @@ public class LinksTests extends TestBase {
 
         assertNotNull(secondResponse);
         assertNotNull(secondResponse.next());
+        assertEquals(limit, secondResponse.items().size());
 
         var ids = links.stream().map(LinkResponse::id).sorted().collect(Collectors.toList());
         var responseIds = Stream.concat(firstResponse.items().stream(), secondResponse.items()
