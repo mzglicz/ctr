@@ -1,0 +1,13 @@
+de:
+  flapdoodle:
+    mongodb:
+      embedded:
+         version: 3.6.1
+
+spring:
+  data:
+    mongodb:
+      host: localhost
+      port: 27017
+      username: someuser
+      password: example
