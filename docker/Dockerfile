@@ -1,11 +1,11 @@
 FROM eclipse-temurin:17-jdk-alpine as build
 WORKDIR /workspace/app
 
-COPY ../gradlew .
-COPY ../gradle gradle
-COPY ../build.gradle .
-COPY ../settings.gradle .
-COPY ../src src
+COPY gradlew .
+COPY gradle gradle
+COPY build.gradle .
+COPY settings.gradle .
+COPY src src
 
 RUN ./gradlew bootJar -x test
 
