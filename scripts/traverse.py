@@ -2,9 +2,10 @@ import requests
 import random
 
 # pip3 install requests
-r = requests.get("http://localhost:8080/admin/links")
-items = r.json()
-
+r = requests.get("http://localhost:8080/admin/links?limit=100")
+response = r.json()
+print(response)
+items = response["items"]
 print(items)
 for x in items:
     k = random.randrange(5)

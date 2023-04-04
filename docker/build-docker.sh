@@ -1,3 +1,4 @@
 #!/bin/bash
 
-docker build -f scripts/Dockerfile . -t maciek/ctr
+VERSION=$1
+docker build -f docker/Dockerfile . -t "maciek/ctr:$VERSION"

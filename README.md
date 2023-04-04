@@ -31,8 +31,8 @@ aka `-Dspring.profiles.active=local`
 
 ### Running inside of docker with prometheus
 * Build docker container. This can be done with:
-`./scripts/build-docker.sh` - this basically `docker build -f scripts/Dockerfile . -t maciek/ctr` just to make sure name of the image is consitent
-* Run `docker-compose -f docker/docker-compose-full.yml up`
+`./scripts/build-docker.sh <VERSION>` - this basically `docker build -f scripts/Dockerfile . -t maciek/ctr:$VERSION` just to make sure name of the image is consitent
+* Run `docker-compose -f docker/docker-compose-full.yml up` - docker-compose needs to be update to have the correct tag
 
 ### Generating some data
 Run `./scripts/create_links.sh <count>` - this will create <count> links in the db
