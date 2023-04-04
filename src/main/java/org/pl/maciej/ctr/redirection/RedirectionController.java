@@ -9,6 +9,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 import java.net.URI;
 
@@ -22,10 +23,10 @@ public class RedirectionController {
     }
 
     @GetMapping("/links/{url}")
-    public ResponseEntity<Void> click(@Size(min=1, max=40) @Pattern(regexp = "^[0-9a-zA-Z\\-]+$") @PathVariable("url") String url) {
+    public Mono<ResponseEntity<Void>> click(@Size(min=1, max=40) @Pattern(regexp = "^[0-9a-zA-Z\\-]+$") @PathVariable("url") String url) {
         return this.redirectionService.getRedirection(url)
                 .map(x -> ResponseEntity.status(HttpStatus.TEMPORARY_REDIRECT)
                         .location(URI.create(x.target())))
-                .orElseGet(() -> ResponseEntity.status(HttpStatus.NOT_FOUND)).build();
+                .defaultIfEmpty(ResponseEntity.status(HttpStatus.NOT_FOUND)).map(ResponseEntity.HeadersBuilder::build);
     }
 }

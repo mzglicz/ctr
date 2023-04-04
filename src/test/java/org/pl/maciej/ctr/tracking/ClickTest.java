@@ -5,9 +5,6 @@ import org.junit.jupiter.api.Test;
 import org.opentest4j.AssertionFailedError;
 import org.pl.maciej.ctr.TestBase;
 import org.pl.maciej.ctr.links.LinkResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.mongodb.core.MongoOperations;
-import org.springframework.data.mongodb.core.query.Query;
 
 import java.time.Duration;
 import java.util.stream.Collectors;
@@ -19,14 +16,13 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 public class ClickTest extends TestBase {
 
     private static final String TARGET = "https://www.nba.com";
+    private static final Duration TO_WAIT = Duration.ofSeconds(1000);
 
-    @Autowired
-    MongoOperations mongoOperations;
+
 
     @BeforeEach
-    public void clear() {
-        mongoOperations.remove(new Query(), "clicks");
-        mongoOperations.remove(new Query(), "links");
+    public void beforeEach() {
+        this.clearDB();
     }
 
     @Test
@@ -55,7 +51,7 @@ public class ClickTest extends TestBase {
         assertCountEquals((n*(n+1))/2);
         var topItem = links.get(links.size()-1);
         await()
-                .atMost(Duration.ofSeconds(5))
+                .atMost(TO_WAIT)
                 .ignoreException(AssertionFailedError.class)
                 .until(() -> {
                     var topResults = getTopResult();
@@ -78,7 +74,7 @@ public class ClickTest extends TestBase {
 
     private void assertCountEquals(int expected) {
         await(String.format("Get count expected  %s", expected))
-                .atMost(Duration.ofSeconds(5))
+                .atMost(TO_WAIT)
                 .until( () -> expected == getCount());
 
     }

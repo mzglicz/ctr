@@ -1,8 +1,13 @@
 package org.pl.maciej.ctr.links.storage;
 
+import com.mongodb.client.result.UpdateResult;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.query.*;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 import java.util.Optional;
@@ -10,46 +15,51 @@ import java.util.Optional;
 @Component
 public class LinkMongoStorage {
 
-    private final MongoOperations mongoOperations;
+    private final ReactiveMongoOperations
+            mongoOperations;
 
-    public LinkMongoStorage(MongoOperations mongoOperations) {
+    public LinkMongoStorage(ReactiveMongoOperations
+                                    mongoOperations) {
         this.mongoOperations = mongoOperations;
     }
 
-    public LinkDocument save(LinkDocument document) {
+    public Mono<LinkDocument> save(LinkDocument document) {
         return this.mongoOperations.save(document);
     }
 
-    public Optional<LinkDocument> get(String relativeUrl) {
+    public Mono<LinkDocument> get(String relativeUrl) {
         var query = new Query();
         query.addCriteria(Criteria.where("relativeUrl").is(relativeUrl));
 
-        var element = this.mongoOperations.findOne(query, LinkDocument.class, "links");
-        return Optional.ofNullable(element);
+        return this.mongoOperations.findOne(query, LinkDocument.class, "links");
     }
 
-    public List<LinkDocument> getAll() {
+    public Flux<LinkDocument> getAll(int limit, Optional<String> next) {
+        Query query = new Query();
+        query.limit(limit);
+        query.with(Sort.by(Sort.Direction.ASC, "_id"));
+        next.ifPresent(value -> query.addCriteria(Criteria.where("_id").gt(value)));
         return this.mongoOperations.findAll(LinkDocument.class, "links");
     }
 
-    public Optional<LinkDocument> getById(String id) {
-        return Optional.ofNullable(this.mongoOperations.findById(id, LinkDocument.class, "links"));
+    public Mono<LinkDocument> getById(String id) {
+        return this.mongoOperations.findById(id, LinkDocument.class, "links");
     }
 
-    public Optional<LinkDocument> deleteById(String id) {
+    public Mono<LinkDocument> deleteById(String id) {
         var query = new Query();
         query.addCriteria(Criteria.where("_id").is(id));
-        var result = this.mongoOperations.findAndRemove(query, LinkDocument.class, "links");
-        return Optional.ofNullable(result);
+        return mongoOperations.findAndRemove(query, LinkDocument.class, "links");
     }
 
-    public long update(String id, LinkUpdateDocument linkUpdateDocument) {
+    public Mono<Long> update(String id, LinkUpdateDocument linkUpdateDocument) {
         var query = new Query();
         query.addCriteria(Criteria.where("_id").is(id));
         var update = new Update();
         linkUpdateDocument.url().ifPresent(url -> update.set("url", url));
         linkUpdateDocument.target().ifPresent(target -> update.set("target", target));
 
-        return this.mongoOperations.updateFirst(query, update, "links").getMatchedCount();
+        return this.mongoOperations.updateFirst(query, update, "links")
+                .map(UpdateResult::getMatchedCount);
     }
 }

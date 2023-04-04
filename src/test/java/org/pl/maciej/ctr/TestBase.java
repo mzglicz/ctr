@@ -5,6 +5,8 @@ import org.pl.maciej.ctr.links.LinkResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.mongodb.core.ReactiveMongoOperations;
+import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -20,6 +22,14 @@ public class TestBase {
 
     @Autowired
     protected WebTestClient webTestClient;
+
+    @Autowired
+    ReactiveMongoOperations mongoOperations;
+
+    protected void clearDB() {
+        mongoOperations.remove(new Query(), "clicks").block();
+        mongoOperations.remove(new Query(), "links").block();
+    }
 
     protected LinkResponse createLink(String target) {
         // TODO This should actually return the "location" header - figure out how to use it
