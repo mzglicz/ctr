@@ -10,7 +10,7 @@ services:
     ports:
       - 27017:27017
   service:
-    image: maciek/ctr:v3
+    image: maciek/ctr
     container_name: ctr-service
     environment:
       MONGO_PORT: 27017

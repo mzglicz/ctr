@@ -6,17 +6,14 @@ And the interation is going to be logged (should be sent to kafka)
 And stored in different collection
 
 Structure
-├── docker
+* docker
     - files for docker compose - init-mongo.js does not currently work hence one needs to create
     indexes manually (docker exec + mongosh)
-├── src
+* src
     - java code + tests, test I'd prefer test in groovy - did not get to it.
-├── scripts
+* scripts
     - helper scripts, to get some data in 
 
-├── gradle
-    - gradle wrapper
-└── README.md
 
 ## Getting started
 
@@ -31,8 +28,8 @@ aka `-Dspring.profiles.active=local`
 
 ### Running inside of docker with prometheus
 * Build docker container. This can be done with:
-`./scripts/build-docker.sh <VERSION>` - this basically `docker build -f scripts/Dockerfile . -t maciek/ctr:$VERSION` just to make sure name of the image is consitent
-* Run `docker-compose -f docker/docker-compose-full.yml up` - docker-compose needs to be update to have the correct tag
+`./scripts/build-docker.sh <tag>` - this basically `docker build -f scripts/Dockerfile . -t maciek/ctr:$VERSION` if no version is specified will fallback to latest tag
+* Run `docker-compose -f docker/docker-compose-full.yml up` - docker-compose needs to be update to have the correct tag (if built with version)
 
 ### Generating some data
 Run `./scripts/create_links.sh <count>` - this will create <count> links in the db
