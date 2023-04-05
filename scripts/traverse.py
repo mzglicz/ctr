@@ -14,6 +14,6 @@ for x in items:
         url = x["url"]
         print(f"Visiting {id} time: {i+1}")
         r = requests.get(url)
-        if r.status_code is not 200:
+        if r.status_code != 200:
             print(f"Something went wrong for {id} {url} got {r.status_code}")
 

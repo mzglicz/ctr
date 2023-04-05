@@ -3,7 +3,7 @@ Simple CTR application.
 Allows you to create links in the database
 Once user clicks on the link they will be redirected to the specified target
 And the interation is going to be logged (should be sent to kafka)
-And stored in different collection
+And stored in different collection and / or db
 
 Structure
 * docker

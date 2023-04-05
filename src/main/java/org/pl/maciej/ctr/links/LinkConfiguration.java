@@ -6,7 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import java.util.UUID;
 
 @Configuration
-public class AppConfiguration {
+public class LinkConfiguration {
 
     @Bean
     public IdProvider getIdProvider() {

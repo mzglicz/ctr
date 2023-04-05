@@ -15,6 +15,8 @@ db.links.createIndex({
     unique: true
 }
 )
+db.clicks.createIndex({ "elementId":1 }, { unique: true})
 print("Created collections")
 
 print(db.links.getIndexes())
+print(db.clicks.getIndexes())
