@@ -1,7 +1,8 @@
 spring:
   data:
     mongodb:
-      host: localhost
-      port: 27017
-      username: root
-      password: example
+      uri: "mongodb://root:example@localhost:27017/ctr?authSource=admin&serverSelectionTimeoutMS=5000&connectTimeoutMS=5000&socketTimeoutMS=2000"
+#      host: localhost
+#      port: 27017
+#      username: root
+#      password: example

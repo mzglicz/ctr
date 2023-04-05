@@ -18,11 +18,9 @@ public class ClickTest extends TestBase {
     private static final String TARGET = "https://www.nba.com";
     private static final Duration TO_WAIT = Duration.ofSeconds(1000);
 
-
-
     @BeforeEach
     public void beforeEach() {
-        this.clearDB();
+        this.setupDB();
     }
 
     @Test
