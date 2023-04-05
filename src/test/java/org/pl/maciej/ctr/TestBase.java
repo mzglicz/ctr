@@ -5,15 +5,14 @@ import org.pl.maciej.ctr.links.LinkResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
+import org.springframework.data.mongodb.core.index.Index;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.reactive.server.WebTestClient;
-
-import java.net.MalformedURLException;
-import java.net.URL;
 
 @AutoConfigureObservability
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
@@ -26,9 +25,19 @@ public class TestBase {
     @Autowired
     ReactiveMongoOperations mongoOperations;
 
-    protected void clearDB() {
+    protected void setupDB() {
         mongoOperations.remove(new Query(), "clicks").block();
         mongoOperations.remove(new Query(), "links").block();
+        createIndexes();
+    }
+
+    protected void createIndexes() {
+        mongoOperations.indexOps("links")
+                .ensureIndex(new Index().on("relativeUrl", Sort.Direction.ASC))
+                .block();
+        mongoOperations.indexOps("clicks")
+                .ensureIndex(new Index().on("eventId", Sort.Direction.ASC).unique())
+                .block();
     }
 
     protected LinkResponse createLink(String target) {

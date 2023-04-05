@@ -126,7 +126,7 @@ public class LinksTests extends TestBase {
 
     @Test
     public void getAllElementsPaginationWorks() {
-        clearDB();
+        setupDB();
         int n = 2;
         int limit = 10;
         var links = IntStream.range(0, limit * n).boxed().map(i -> createLink(TARGET+i))
