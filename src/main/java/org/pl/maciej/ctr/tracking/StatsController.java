@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import reactor.core.publisher.Mono;
 
 @RestController
 @RequestMapping("/stats")
@@ -18,12 +19,12 @@ public class StatsController {
     }
 
     @GetMapping("/count")
-    public CountResult getCount() {
-        return new CountResult(this.eventService.getClickCount());
+    public Mono<CountResult> getCount() {
+        return this.eventService.getClickCount().map(CountResult::new);
     }
 
     @GetMapping("/top")
-    public TopResultResponse getTopResult(@Min(1) @Max(100) @RequestParam(value = "limit", defaultValue = "10") int limit) {
-        return new TopResultResponse(this.eventService.getTopCount(limit));
+    public Mono<TopResultResponse> getTopResult(@Min(1) @Max(100) @RequestParam(value = "limit", defaultValue = "10") int limit) {
+        return this.eventService.getTopCount(limit).collectList().map(TopResultResponse::new);
     }
 }

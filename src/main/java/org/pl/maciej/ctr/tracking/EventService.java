@@ -3,13 +3,11 @@ package org.pl.maciej.ctr.tracking;
 
 import org.pl.maciej.ctr.tracking.storage.ClickEventDocument;
 import org.pl.maciej.ctr.tracking.storage.EventMongoStorage;
-import org.pl.maciej.ctr.tracking.storage.TopResultDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
-import java.util.stream.Collectors;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 @Component
 public class EventService implements EventConsumer {
@@ -26,19 +24,18 @@ public class EventService implements EventConsumer {
     public void consumer(Event event) {
         if ("click".equals(event.actionId())) {
             var document = new ClickEventDocument(event.eventId(), event.elementId(), event.extra());
-            this.eventMongoStorage.save(document);
-            log.info("Stored event {} ", event.eventId());
+            this.eventMongoStorage.save(document)
+                    .subscribe(x -> log.info("Stored event {} {}", event.eventId(), x.getId()), y -> log.error("Failed to store event {}", event.eventId(), y));
         }
     }
 
-    public long getClickCount() {
+    public Mono<Long> getClickCount() {
         return this.eventMongoStorage.getCount();
     }
 
-    public List<TopResult> getTopCount(int limit) {
+    public Flux<TopResult> getTopCount(int limit) {
         return this.eventMongoStorage.getTop(limit)
-                .stream()
-                .map(x -> new TopResult(x.elementId(), x.count()))
-                .collect(Collectors.toList());
+                .map(x -> new TopResult(x.elementId(), x.count()));
+
     }
 }

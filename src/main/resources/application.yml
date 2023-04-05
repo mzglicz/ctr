@@ -17,6 +17,10 @@ management:
           - beans
           - prometheus
           - health
+server:
+  error:
+    whitelabel:
+      enabled: false
 
 
 

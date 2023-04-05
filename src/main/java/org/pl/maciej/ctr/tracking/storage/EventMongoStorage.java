@@ -2,9 +2,12 @@ package org.pl.maciej.ctr.tracking.storage;
 
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
+import org.springframework.data.mongodb.core.ReactiveMongoOperations;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.stereotype.Component;
+import reactor.core.publisher.Flux;
+import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -13,25 +16,26 @@ public class EventMongoStorage {
 
     public static final String CLICKS = "clicks";
     public static final String ELEMENT_ID = "elementId";
-    private final MongoOperations mongoOperations;
+    private final ReactiveMongoOperations mongoOperations;
 
-    public EventMongoStorage(MongoOperations mongoOperations) {
+    public EventMongoStorage(ReactiveMongoOperations mongoOperations) {
         this.mongoOperations = mongoOperations;
     }
 
-    public ClickEventDocument save(ClickEventDocument eventDocument) {
+    public Mono<ClickEventDocument> save(ClickEventDocument eventDocument) {
         return this.mongoOperations.save(eventDocument);
     }
 
-    public long getCount() {
-        return this.mongoOperations.count(new Query(), CLICKS);
+    public Mono<Long> getCount() {
+        //return this.mongoOperations.exactCount(new Query(), CLICKS);
+        return this.mongoOperations.exactCount(new Query(), ClickEventDocument.class, CLICKS);
     }
 
-    public List<TopResultDocument> getTop(long limit){
-        var groupStage = Aggregation.group(ELEMENT_ID).count().as("count");
-        var sortStage = Aggregation.sort(Sort.Direction.DESC, "count");
+    public Flux<TopResultDocument> getTop(long limit){
+        String count = "count";
+        var groupStage = Aggregation.group(ELEMENT_ID).count().as(count);
+        var sortStage = Aggregation.sort(Sort.Direction.DESC, count);
         var l = Aggregation.limit(limit);
-        var obj = this.mongoOperations.aggregate(Aggregation.newAggregation(groupStage, sortStage, l), CLICKS, TopResultDocument.class);
-        return obj.getMappedResults();
+        return this.mongoOperations.aggregate(Aggregation.newAggregation(groupStage, sortStage, l), CLICKS, TopResultDocument.class);
     }
 }
