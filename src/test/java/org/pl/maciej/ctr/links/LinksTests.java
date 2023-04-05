@@ -102,7 +102,7 @@ public class LinksTests extends TestBase {
     }
 
     @Test
-    public void updateWorks() throws MalformedURLException {
+    public void updateWorks() {
         var newTarget = "https://onet.pl";
         var response = createLink(TARGET);
         var uri = getLinkURI(response.id());

@@ -1,6 +1,7 @@
 package org.pl.maciej.ctr.links.storage;
 
 import com.mongodb.client.result.UpdateResult;
+import org.bson.types.ObjectId;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoOperations;
 import org.springframework.data.mongodb.core.ReactiveMongoOperations;
@@ -38,7 +39,7 @@ public class LinkMongoStorage {
         Query query = new Query();
         query.limit(limit);
         query.with(Sort.by(Sort.Direction.ASC, "_id"));
-        next.ifPresent(value -> query.addCriteria(Criteria.where("_id").gt(value)));
+        next.ifPresent(value -> query.addCriteria(Criteria.where("_id").gt(new ObjectId(value))));
         return this.mongoOperations.find(query, LinkDocument.class, "links");
     }
 
