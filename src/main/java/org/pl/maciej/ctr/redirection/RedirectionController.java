@@ -1,6 +1,7 @@
 package org.pl.maciej.ctr.redirection;
 
 
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import org.springframework.http.HttpStatus;

@@ -1,54 +1,59 @@
 package org.pl.maciej.ctr.links;
 
 import org.pl.maciej.ctr.links.storage.LinkDocument;
-import org.pl.maciej.ctr.links.storage.LinkMongoStorage;
+import org.pl.maciej.ctr.links.storage.LinkRepository;
 import org.pl.maciej.ctr.links.storage.LinkUpdateDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 import org.springframework.stereotype.Component;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
-
-import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Component
 public class LinkService {
 
     private static final Logger log = LoggerFactory.getLogger(LinkService.class);
 
-    private final LinkMongoStorage linkMongoStorage;
     private final UrlProvider urlProvider;
 
-    public LinkService(LinkMongoStorage linkMongoStorage, UrlProvider urlProvider) {
-        this.linkMongoStorage = linkMongoStorage;
+    private final Cache cache;
+    private final LinkRepository linkRepository;
+
+    public LinkService(UrlProvider urlProvider, CacheManager cacheManager, LinkRepository linkRepository) {
         this.urlProvider = urlProvider;
+        this.cache = cacheManager.getCache("get");
+        this.linkRepository = linkRepository;
     }
 
     public Mono<LinkResponse> save(LinkRequest linkRequest) {
-        var unique = this.urlProvider.generateUniqueIdentifier(linkRequest.target().toString());
-        LinkDocument linkDocument = new LinkDocument(linkRequest.target().toString(), unique);
-        var result = this.linkMongoStorage.save(linkDocument);
+        var unique = this.urlProvider.generateUniqueIdentifier(linkRequest.target());
+        LinkDocument linkDocument = new LinkDocument(linkRequest.target(), unique);
+        var result = this.linkRepository.save(linkDocument);
         return result.map(x -> new LinkResponse(x.getId(), x.getTarget(), this.urlProvider.getRelativeUrl(x.getRelativeUrl())));
     }
 
     public Mono<LinkResponse> getByRelativeUrl(String relativeUrl) {
-        return this.linkMongoStorage.get(relativeUrl).map(this::toLinkResponse);
+        return Mono.justOrEmpty(cache.get(relativeUrl, LinkResponse.class))
+                .switchIfEmpty(Mono.defer(() -> this.linkRepository.findByRelativeUrl(relativeUrl)
+                        .map(this::toLinkResponse)
+                        .doOnSuccess(x -> cache.put(relativeUrl,x))));
     }
 
     public Mono<LinkResponse> get(String id) {
-        return this.linkMongoStorage.getById(id).map(this::toLinkResponse);
+        return this.linkRepository.findById(id).map(this::toLinkResponse);
     }
 
     public Mono<Boolean> update(String id, LinkRequest request) {
-        return this.linkMongoStorage.update(id,
+        return this.linkRepository.update(id,
                 new LinkUpdateDocument(Optional.of(request.target()), Optional.empty())).log().doOnSuccess(element -> log.info(String.valueOf(element))).map(x -> x == 1);
     }
 
     public Flux<LinkResponse> getAll(int limit, String next) {
-        return this.linkMongoStorage.getAll(limit, Optional.ofNullable(next))
+        return this.linkRepository.queryForAllWithOffset(limit, Optional.ofNullable(next))
                 .map(this::toLinkResponse);
     }
 
@@ -60,7 +65,7 @@ public class LinkService {
         );
     }
 
-    public Mono<Boolean> delete(String id) {
-        return this.linkMongoStorage.deleteById(id).hasElement();
+    public Mono<Void> delete(String id) {
+        return this.linkRepository.deleteById(id);
     }
 }

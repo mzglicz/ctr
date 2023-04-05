@@ -41,4 +41,5 @@ public class ClickEventDocument {
     public Map<String, String> getExtra() {
         return extra;
     }
+
 }

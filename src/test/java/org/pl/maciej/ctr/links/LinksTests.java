@@ -91,14 +91,7 @@ public class LinksTests extends TestBase {
                 .uri(uri)
                 .exchange()
                 .expectStatus()
-                .isEqualTo(204);
-
-        webTestClient
-                .delete()
-                .uri(uri)
-                .exchange()
-                .expectStatus()
-                .isEqualTo(404);
+                .is2xxSuccessful();
     }
 
     @Test

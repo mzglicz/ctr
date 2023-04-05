@@ -3,26 +3,24 @@ package org.pl.maciej.ctr.tracking;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
-import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.pl.maciej.ctr.tracking.storage.ClickEventDocument;
-import org.pl.maciej.ctr.tracking.storage.EventMongoStorage;
+import org.pl.maciej.ctr.tracking.storage.ClickEventRepository;
 import reactor.core.publisher.Mono;
 
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 class EventServiceTest {
 
-    EventMongoStorage storage;
+    ClickEventRepository storage;
 
     EventService underTest;
 
     @BeforeEach
     void setup() {
-        storage = mock(EventMongoStorage.class);
+        storage = mock(ClickEventRepository.class);
         underTest = new EventService(storage);
     }
 
@@ -47,6 +45,6 @@ class EventServiceTest {
     @Test
     void getClickCount() {
         underTest.getClickCount();
-        verify(storage, times(1)).getCount();
+        verify(storage, times(1)).count();
     }
 }
