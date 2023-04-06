@@ -5,12 +5,10 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 import java.net.URI;
@@ -47,7 +45,8 @@ public class AdminLinksController {
     @DeleteMapping("/{id}")
     Mono<ResponseEntity<Void>> delete(@Size(min=1, max=40) @Pattern(regexp = "^[0-9a-zA-Z\\-]+$") @PathVariable("id") String id) {
         return this.linkService.delete(id)
-                .map(deleted -> deleted ? ResponseEntity.status(HttpStatus.NO_CONTENT.value()).build() : ResponseEntity.status(HttpStatus.NOT_FOUND.value()).build());
+                .map(x -> new ResponseEntity<Void>(HttpStatus.NO_CONTENT))
+                .onErrorReturn(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
     @GetMapping("")

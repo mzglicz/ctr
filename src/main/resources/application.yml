@@ -8,6 +8,10 @@ spring:
 #      password: ${PASSWORD}
 #      database: ctr
 #      authenticationDatabase: admin
+  cache:
+    caffeine:
+      spec: "maximumSize=10000,expireAfterAccess=5m,recordStats"
+    cache-names: "get"
 
 management:
   endpoints:
@@ -22,6 +26,11 @@ server:
   error:
     whitelabel:
       enabled: false
+
+
+
+
+
 
 
 
