@@ -30,7 +30,7 @@ class EventServiceTest {
         var clickEvent = new Event(eventId, "elementId", "click", Map.of());
         var captor = ArgumentCaptor.forClass(ClickEventDocument.class);
 
-        Mockito.when(storage.save(captor.capture())).thenReturn(Mono.just(new ClickEventDocument()));
+        Mockito.when(storage.save(captor.capture())).thenReturn(Mono.just(new ClickEventDocument("a","b", Map.of())));
         underTest.consumer(clickEvent);
 
     }

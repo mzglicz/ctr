@@ -33,7 +33,7 @@ public class LinkService {
         var unique = this.urlProvider.generateUniqueIdentifier(linkRequest.target());
         LinkDocument linkDocument = new LinkDocument(linkRequest.target(), unique);
         var result = this.linkRepository.save(linkDocument);
-        return result.map(x -> new LinkResponse(x.getId(), x.getTarget(), this.urlProvider.getRelativeUrl(x.getRelativeUrl())));
+        return result.map(x -> new LinkResponse(x.id(), x.target(), this.urlProvider.getRelativeUrl(x.relativeUrl())));
     }
 
     public Mono<LinkResponse> getByRelativeUrl(String relativeUrl) {
@@ -59,9 +59,9 @@ public class LinkService {
 
     private LinkResponse toLinkResponse(LinkDocument linkDocument) {
         return new LinkResponse(
-                linkDocument.getId(),
-                linkDocument.getTarget(),
-                urlProvider.getAbsolute(linkDocument.getRelativeUrl())
+                linkDocument.id(),
+                linkDocument.target(),
+                urlProvider.getAbsolute(linkDocument.relativeUrl())
         );
     }
 

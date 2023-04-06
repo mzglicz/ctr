@@ -25,7 +25,7 @@ public class EventService implements EventConsumer {
         if ("click".equals(event.actionId())) {
             var document = new ClickEventDocument(event.eventId(), event.elementId(), event.extra());
             this.clickEventRepository.save(document)
-                    .subscribe(x -> log.info("Stored event {} {}", event.eventId(), x.getId()), y -> log.error("Failed to store event {}", event.eventId(), y));
+                    .subscribe(x -> log.info("Stored event {} {}", event.eventId(), x.id()), y -> log.error("Failed to store event {}", event.eventId(), y));
         }
     }
 
