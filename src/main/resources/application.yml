@@ -27,14 +27,6 @@ server:
     whitelabel:
       enabled: false
 
-resilience4j.ratelimiter:
-  instances:
-    redirection:
-      limitForPeriod: 10
-      limitRefreshPeriod: 1s
-      timeoutDuration: 0
-      registerHealthIndicator: true
-      eventConsumerBufferSize: 100
 
 
 
